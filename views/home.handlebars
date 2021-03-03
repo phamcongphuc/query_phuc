@@ -1,0 +1,59 @@
+<div class="row justify-content-md-center">
+    <div class="col-2">
+        <form method="POST" action="/" enctype="multipart/form-data">
+            <label for="formFile" class="form-label">Input your csv file</label>
+            <input class="form-control" type="file" name="formFile" id="formFile">
+            <button type="submit" class="btn btn-primary">Load file</button>
+        </form>
+    </div>
+
+</div>
+
+<div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">Fillter</span>
+    <form action="/filter" method="POST">
+
+    <input id="product" type="text" class="form-control" placeholder="Product" name="product">
+    <input type="text" class="form-control" placeholder="Promotion1" name="promotion">
+       <input type="text" class="form-control" placeholder="Promotion2" name="promotion2">
+          <input type="text" class="form-control" placeholder="Promotion3" name="promotion3">
+    <input type="text" class="form-control" value="NOTI" placeholder="Channel" name="channel">
+    <input type="text" class="form-control" value="" placeholder="Channel1" name="channel1">
+    <button type="submit" class="btn btn-primary">ok</button>
+          
+    </form>
+     
+</div>
+<div class="input-group mb-2">
+    <form action="/filterAll" method="POST">
+   <span class="input-group-text" id="basic-addon1">FillAll</span> 
+    <input id="product" type="text" class="form-control" placeholder="Product" name="product">
+    <input type="text" class="form-control" placeholder="Promotion" name="promotion">
+   
+    <button type="submit" class="btn btn-primary">ok</button>
+            
+    </form>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Promotion</th>
+            <th scope="col">Channel</th>
+            <th scope="col">Encrypted_Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list}}
+        <tr>
+            <th>{{this.product}}</th>
+            <td>{{this.promotion}}</td>
+            <td>{{this.channel}}</td>
+            <td>{{this.Encrypted_Phone}}</td>
+        </tr>
+        {{/each }}
+    </tbody>
+</table>
+<script>
+</script>
