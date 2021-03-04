@@ -8,7 +8,6 @@ var exphbs = require('express-handlebars');
 const multer = require('multer');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-const ObjectsToCsv = require('objects-to-csv');
 
 let upload = multer({ dest: 'uploads/' })
 
