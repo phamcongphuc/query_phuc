@@ -116,8 +116,8 @@ app.post('/', upload.single('formFile'), (req, res) => {
 
 
 
-app.listen(process.env.PORT, () => {
-    console.log("Server is listening on port");
+app.listen(3000, () => {
+    console.log("Server is listening on port" + 3000);
 })
 
 function getID() {
