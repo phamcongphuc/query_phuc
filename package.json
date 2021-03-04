@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,5 +25,8 @@
     "nodemon": "^2.0.7",
     "reload": "^3.1.1",
     "sequelize": "^6.5.0"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
