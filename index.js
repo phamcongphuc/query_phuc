@@ -8,131 +8,108 @@ var exphbs = require('express-handlebars');
 const multer = require('multer');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const ObjectsToCsv = require('objects-to-csv');
 
-var upload = multer({ dest: 'uploads/' })
+let upload = multer({ dest: 'uploads/' })
 
-
-
-// parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-// parse requests of content-type - application/json
 app.use(bodyParser.json());
+app.use(express.static('FileProcess'))
 
-
-var fileName = ""
 let csvData = [];
-const savedata = [];
+let countData = [];
+let tempFile = [];
 
-
-var hbs = exphbs.create({
+let hbs = exphbs.create({
     handlebars: allowInsecurePrototypeAccess(handlebars),
 });
 
-// Register `hbs.engine` with the Express app.
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-
-
 app.get('/', (req, res) => {
-    res.render('home')
-})
-app.post('/filter', (req, res) => {
-   // condition query channel = noti
-    const data_noti = []
-    const mapData = []
-    const fill_noti = {
-        product: req.body.product,
-        promotion: req.body.promotion,
-        channel: req.body.channel
-    }
-    // condition query channel get all
-    const data_all = []
-    const fill_all = {
-        product: req.body.product,
-        promotion: req.body.promotion        
-    }
-    //end test
-    console.log(fill_noti)
-    console.log(fill_all)
-    csvData.forEach((item) => {
-
-        if (
-            item.product === fill_noti.product &&
-            item.promotion === fill_noti.promotion &&
-            item.channel === fill_noti.channel
-           
-        ) {
-            data_noti.push({ Encrypted_Phone: item.Encrypted_Phone })
-        }
-        item.product === fill_all.product &&
-        item.promotion === fill_all.promotion 
-        data_all.push({ Encrypted_Phone: item.Encrypted_Phone })
-       
+    res.render('home', {
+        list: countData
     });
+})
 
-    // write file channel = noti
+
+app.get('/download', async (req, res) => {
+    // Lọc điều kiện
+    const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom);
+    let fileNameDownload = getID() + '.csv';
     const csvWriter = createCsvWriter({
-        path:  fill_noti.product + '_' + fill_noti.promotion + '_' + fill_noti.channel + '.csv',
+        path: './FileProcess/' + fileNameDownload,
         header: [
             { id: 'Encrypted_Phone', title: 'Encrypted_Phone' },
         ]
     });
-
-    const record_noti = data_noti
-
-    csvWriter.writeRecords(record_noti)       // returns a promise
-        .then(() => {
-            console.log(data.length)
-            console.log('...Done');
+    // Ghi ra file
+    csvWriter.writeRecords(query).then(() => {
+        tempFile.push(fileNameDownload);
+        // Tải file
+        res.download('./FileProcess/' + fileNameDownload, () => {
+            fs.unlinkSync('./FileProcess/' + fileNameDownload);
         });
-    // console.log(data)
-    res.render('home', { list: data_noti })
-    // write file ALL
-    const csvWriterAll = createCsvWriter({
-        path:  fill_all.product + '_' + fill_all.promotion + '_' + 'ALL' + '.csv',
-        header: [
-            { id: 'Encrypted_Phone', title: 'Encrypted_Phone' },
-        ]
-    });
-
-    const record_aLL = data_all
-
-    csvWriterAll.writeRecords(record_aLL)       // returns a promise
-        .then(() => {
-            console.log(data_all.length)
-            console.log('...Done');
-        });
-    res.render('home', { list: data_all })
-      
-})
-
-app.get('/', (req, res) => {
-    res.render('home')
+    })
 })
 
 
 app.post('/', upload.single('formFile'), (req, res) => {
-    console.log(req.file)
-    fileName = req.file.filename
-    // reset list
+    countData = [];
     csvData = [];
-    fs.createReadStream(__dirname + '/uploads/' + req.file.filename)
-        
-        .pipe(
-            parse({
-                delimiter: ","
+    let listProd = [];
+    let listProm = [];
+    let listChannel = [];
+    if (req.file != null) {
+        fileName = req.file.filename
+        fs.createReadStream(__dirname + '/uploads/' + req.file.filename)
+            .pipe(
+                parse({
+                    delimiter: ","
+                }))
+            .on('data', function (dataRow) {
+                csvData.push(dataRow);
             })
-        )
-        .on('data', function (dataRow) {
-            csvData.push(dataRow);
-        })
-        .on('end', function () {
-            res.render('home', {
-                list: csvData
+            .on('end', function () {
+                // Lấy tất cá trường hợp của trường product, promotion và channel
+                csvData = csvData.filter(item => item.product != '' && item.promotion != '' && item.channel != '')
+                // Lọc trùng + lấy dữ liệu
+                listProd = Array.from(new Set(csvData.map((item) => {
+                    return item.product;
+                })))
+                listProm = Array.from(new Set(csvData.map((item) => {
+                    return item.promotion;
+                })))
+                listChannel = Array.from(new Set(csvData.map((item) => {
+                    return item.channel;
+                })))
+                // Lấy tất cả các trường hợp theo thứ tự product > promotion
+                listProd.forEach((prod) => {
+                    listProm.forEach((prom) => {
+                        let filler = csvData.filter(item => item.product == prod && item.promotion == prom)
+                        const channelOnRs = Array.from(new Set(filler.map((item) => {
+                            return item.channel;
+                        })))
+                        if (filler.length >= 100) {
+                            countData.push({ Product: prod, Promotion: prom, Channel: JSON.stringify(channelOnRs), Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom })
+                        }
+                        listChannel.forEach((channel) => {
+                            filler = csvData.filter(item => item.product == prod && item.promotion == prom && item.channel == channel);
+                            if (filler.length >= 100) {
+                                countData.push({ Product: prod, Promotion: prom, Channel: channel, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom })
+                            }
+                        })
+                    })
+                })
+                fs.unlinkSync(__dirname + '/uploads/' + req.file.filename);
+                res.render('home', {
+                    list: countData
+                });
             });
-        }
-        );
+    } else {
+        res.render('home');
+    }
 })
 
 
@@ -144,3 +121,7 @@ app.listen(3000, () => {
     console.log("Server is listening on port 3000");
 })
 
+function getID() {
+    let date = new Date();
+    return date.getFullYear() + '' + date.getMonth() + '' + date.getDay() + '' + date.getTime();
+}
