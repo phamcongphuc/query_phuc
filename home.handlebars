@@ -1,0 +1,39 @@
+<div class="row justify-content-md-center">
+    <div class="col-4">
+        <form method="POST" action="/" enctype="multipart/form-data">
+            {{!-- <input class="form-control" type="file" name="formFile" id="formFile">
+            <button type="submit" class="btn btn-primary">Load file</button> --}}
+
+            <div class="input-group">
+                <input type="file" class="form-control" id="formFile" name="formFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                <button class="btn btn-outline-secondary" type="submit">Load file</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Promotion</th>
+            <th scope="col">Channel</th>
+            <th scope="col">Quatity</th>
+            <th scope="col">#</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list}}
+        <tr>
+            <th>{{this.Product}}</th>
+            <td>{{this.Promotion}}</td>
+            <td>{{this.Channel}}</td>
+            <td>{{this.Quatity}}</td>
+            <td><a href="{{this.Link}}">Download</a></td>
+        </tr>
+        {{/each }}
+    </tbody>
+</table>
+<script>
+</script>
