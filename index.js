@@ -9,7 +9,7 @@ const multer = require('multer');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-let upload = multer({ dest: 'uploads/' })
+let upload = multer({ dest: 'Uploads/' })
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -27,6 +27,14 @@ app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 app.get('/', (req, res) => {
+    //Tạo thư mục nếu không tồn tại
+    if (!fs.existsSync('./Uploads')) {
+        fs.mkdirSync('./Uploads');
+    }
+    //Tạo thư mục nếu không tồn tại
+    if (!fs.existsSync('./FileProcess')) {
+        fs.mkdirSync('./FileProcess');
+    }
     res.render('home', {
         list: countData
     });
@@ -37,6 +45,7 @@ app.get('/download', async (req, res) => {
     // Lọc điều kiện
     const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom);
     let fileNameDownload = getID() + '.csv';
+
     const csvWriter = createCsvWriter({
         path: './FileProcess/' + fileNameDownload,
         header: [
@@ -54,15 +63,17 @@ app.get('/download', async (req, res) => {
 })
 
 
+
 app.post('/', upload.single('formFile'), (req, res) => {
     countData = [];
     csvData = [];
     let listProd = [];
     let listProm = [];
     let listChannel = [];
+
     if (req.file != null) {
         fileName = req.file.filename
-        fs.createReadStream(__dirname + '/uploads/' + req.file.filename)
+        fs.createReadStream(__dirname + '/Uploads/' + req.file.filename)
             .pipe(
                 parse({
                     delimiter: ","
@@ -101,7 +112,7 @@ app.post('/', upload.single('formFile'), (req, res) => {
                         })
                     })
                 })
-                fs.unlinkSync(__dirname + '/uploads/' + req.file.filename);
+                fs.unlinkSync(__dirname + '/Uploads/' + req.file.filename);
                 res.render('home', {
                     list: countData
                 });
