@@ -5,13 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "nodemon index"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@handlebars/allow-prototype-access": "^1.0.3",
-    "body-parser": "^1.19.0",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "express": "^4.17.1",
@@ -19,8 +18,7 @@
     "handlebars": "^4.7.7",
     "multer": "^1.4.2",
     "nodemon": "^2.0.7",
-    "reload": "^3.1.1",
-    "sequelize": "^6.5.0"
+    "reload": "^3.1.1"
   },
   "engines": {
     "node": "14.x"

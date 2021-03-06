@@ -1,5 +1,4 @@
 const parse = require('csv-parser')
-const bodyParser = require('body-parser');
 const fs = require('fs')
 const express = require('express')
 const handlebars = require('handlebars')
@@ -11,8 +10,6 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 let upload = multer({ dest: 'Uploads/' })
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 app.use(express.static('FileProcess'))
 
 let csvData = [];
@@ -44,7 +41,7 @@ app.get('/', (req, res) => {
 app.get('/download', async (req, res) => {
     // Lọc điều kiện
     const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom);
-    let fileNameDownload = getID() + '.csv';
+    let fileNameDownload = getID() + '_' + req.query.prod + '_' + req.query.prom + '_' + req.query.channel + '.csv';
 
     const csvWriter = createCsvWriter({
         path: './FileProcess/' + fileNameDownload,
@@ -102,12 +99,12 @@ app.post('/', upload.single('formFile'), (req, res) => {
                             return item.channel;
                         })))
                         if (filler.length >= 100) {
-                            countData.push({ Product: prod, Promotion: prom, Channel: JSON.stringify(channelOnRs), Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom })
+                            countData.push({ Product: prod, Promotion: prom, Channel: JSON.stringify(channelOnRs), Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channelOnRs.toString() })
                         }
                         listChannel.forEach((channel) => {
                             filler = csvData.filter(item => item.product == prod && item.promotion == prom && item.channel == channel);
                             if (filler.length >= 100) {
-                                countData.push({ Product: prod, Promotion: prom, Channel: channel, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom })
+                                countData.push({ Product: prod, Promotion: prom, Channel: channel, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channel })
                             }
                         })
                     })
@@ -122,14 +119,11 @@ app.post('/', upload.single('formFile'), (req, res) => {
     }
 })
 
-
-
-
 app.listen(3000, () => {
     console.log("Server is listening on port" + 3000);
 })
 
 function getID() {
     let date = new Date();
-    return date.getFullYear() + '' + date.getMonth() + '' + date.getDay() + '' + date.getTime();
+    return date.getDay() + '-' + date.getMonth();
 }
