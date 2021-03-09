@@ -44,7 +44,7 @@ app.get('/download', async (req, res) => {
     let types = req.query.type.split()
     const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom);
     console.log(query)
-    let fileNameDownload = getID() + '_' + req.query.prod + '_' + req.query.prom + '_' + req.query.channel + '_' + req.query.type + '.csv';
+    let fileNameDownload = getID() + '_' + req.query.type + '_' + req.query.prod + '_' + req.query.prom + '_' + req.query.channel + '.csv';
 
     const csvWriter = createCsvWriter({
         path: './FileProcess/' + fileNameDownload,
@@ -71,7 +71,6 @@ app.post('/', upload.single('formFile'), (req, res) => {
     let listProm = [];
     let listChannel = [];
     let listType = [];
-
     if (req.file != null) {
         fileName = req.file.filename
         fs.createReadStream(__dirname + '/Uploads/' + req.file.filename)
@@ -106,21 +105,16 @@ app.post('/', upload.single('formFile'), (req, res) => {
                             const channelOnRs = Array.from(new Set(filler.map((item) => {
                                 return item.channel;
                             })))
-                            // if (filler.length >= 100) {
-                            countData.push({ Product: prod, Promotion: prom, Channel: JSON.stringify(channelOnRs), Type: type, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channelOnRs.toString() + "&type=" + type })
-                            // }
+                            if (filler.length >= 100) {
+                                countData.push({ Product: prod, Promotion: prom, Channel: JSON.stringify(channelOnRs), Type: type, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channelOnRs.toString().replace("NOTI,SMS", "ALL").replace("SMS,NOTI", "ALL") + "&type=" + type })
+                            }
                             listChannel.forEach((channel) => {
                                 filler = csvData.filter(item => item.product == prod && item.promotion == prom && item.channel == channel);
-                                // if (filler.length >= 100) {
-                                countData.push({ Product: prod, Promotion: prom, Channel: channel, Type: type, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channel + "&type=" + type })
-                                // }
+                                if (filler.length >= 100) {
+                                    countData.push({ Product: prod, Promotion: prom, Channel: channel, Type: type, Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channel + "&type=" + type })
+                                }
                             })
-                            // listType.forEach((type) => {
-                            //     filler = csvData.filter(item => item.product == prod && item.promotion == prom && item.channel == type);
-                            //     // if (filler.length >= 100) {
-                            //     countData.push({ Product: prod, Promotion: prom, Channel: channel, Type: JSON.stringify(typeOnRs), Quatity: filler.length, Link: "/download?prod=" + prod + "&prom=" + prom + "&channel=" + channel  + "&type=" + type })
-                            //     // }
-                            // })
+
                         })
                     })
                 })
@@ -141,5 +135,6 @@ app.listen(3000, () => {
 
 function getID() {
     let date = new Date();
-    return date.getDate() + '-' + (date.getMonth() + 1);
+    return ("0" + (date.getMonth() + 1)).slice(-2) + ("0" + (date.getDate())).slice(-2)
+
 }
