@@ -42,7 +42,7 @@ app.get('/download', async (req, res) => {
     // Lọc điều kiện
     let channels = req.query.channel.split()
     let types = req.query.type.split()
-    const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom);
+    const query = csvData.filter(item => item.product == req.query.prod && item.promotion == req.query.prom && channels.includes(req.query.channel)&& types.includes(req.query.type));
     console.log(query)
     let fileNameDownload = getID() + '_' + req.query.type + '_' + req.query.prod + '_' + req.query.prom + '_' + req.query.channel + '.csv';
 
