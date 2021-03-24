@@ -10,12 +10,25 @@
 
 </div>
 
+<div class="row justify-content-md-center p-3">
+    <div class="col-6">
+        <form method="POST" action="/Gift" enctype="multipart/form-data">
+            <div class="input-group">
+                <input type="file" class="form-control" id="formFile" name="formFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                <button class="btn btn-outline-secondary" type="submit">Load file have gift</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
 <table class="table p-3">
     <thead>
         <tr>
             <th scope="col">Product</th>
             <th scope="col">Promotion</th>
             <th scope="col">Type</th>
+             <th scope="col">Gift</th>
             <th scope="col">Channel</th>
             <th scope="col">Quatity</th>
             <th scope="col">#</th>
@@ -27,6 +40,7 @@
             <th>{{this.Product}}</th>
             <td>{{this.Promotion}}</td>
             <td>{{this.Type}}</td>
+             <td>{{this.Gift}}</td>
             <td>{{this.Channel}}</td>
             <td>{{this.Quatity}}</td>
             <td><a href="{{this.Link}}">Download</a></td>
