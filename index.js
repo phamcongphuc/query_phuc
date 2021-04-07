@@ -60,7 +60,7 @@ app.get('/download', async (req, res) => {
         console.log('----download---------' + fileNameDownload + '_length:' + query.length)
         // Tải file
         res.download('./FileProcess/' + fileNameDownload, () => {
-            // fs.unlinkSync('./FileProcess/' + fileNameDownload);
+            fs.unlinkSync('./FileProcess/' + fileNameDownload);
         });
     })
 
@@ -84,7 +84,7 @@ app.get('/downloadGift', async (req, res) => {
         console.log('----download---------' + fileNameDownload + '_length:' + query.length)
         // Tải file
         res.download('./FileProcess/' + fileNameDownload, () => {
-            // fs.unlinkSync('./FileProcess/' + fileNameDownload);
+            fs.unlinkSync('./FileProcess/' + fileNameDownload);
         });
     })
 
@@ -244,6 +244,6 @@ app.listen(PORT, HOST);
 console.log(`Running on:${PORT}`);
 function getID() {
     let date = new Date();
-    return ("0" + (date.getMonth() + 1)).slice(-2) + ("0" + (date.getDate())).slice(-2)
+    return "T"+("0" + (date.getMonth() + 1)).slice(-2) + ("0" + (date.getDate())).slice(-2) +( date.getYear() -100)
 
 }

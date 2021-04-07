@@ -1,0 +1,6 @@
+b1: xóa image
+b2: docker build -t <your username>/node-web-app .
+b3: docker run -p 49160:8080 -d <your username>/node-web-app
+
+==> docker build -t phuc/node-web-app .
+docker run -p 9999:3000 -d phuc/node-web-app
